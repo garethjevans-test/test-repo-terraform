@@ -24,11 +24,18 @@ pipeline {
   }
 
   stages {
-    stage('Dummy') {
+    stage('Validate') {
       steps {
         container('terraform') {
           sh 'terraform init'
           sh 'terraform validate'
+        }
+      }
+    }
+    stage('Plan') {
+      when { changeRequest() }
+      steps {
+        container('terraform') {
           script {
             plan = sh(returnStdout: true, script: 'terraform plan -no-color')
             pullRequest.comment('```\n' + plan)
