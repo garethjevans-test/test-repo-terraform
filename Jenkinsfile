@@ -31,13 +31,13 @@ pipeline {
   stages {
     stage('Dummy') {
       steps {
-        script {
-          pullRequest.comment('This PR is highly illogical..')
-        }
         container('terraform') {
           sh 'terraform init'
           sh 'terraform validate'
-          sh 'terraform plan'
+          script {
+            plan = sh(returnStdout: true, script: 'terraform plan')
+            pullRequest.comment('```\n' + plan)
+          }
         }
       }
     }
