@@ -37,6 +37,7 @@ pipeline {
         container('terraform') {
           sh 'terraform init'
           sh 'terraform validate'
+          sh 'terraform plan'
         }
       }
     }
