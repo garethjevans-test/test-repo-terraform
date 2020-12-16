@@ -1,5 +1,21 @@
+def terraformTemplate = """
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: terraform
+    image: hashicorp/terraform:0.13.5
+    command:
+    - cat
+    tty: true
+"""
+
 pipeline {
-  agent any
+  agent {
+    kubernetes {
+      yaml terraformTemplate
+    }
+  }
 
   options {
     buildDiscarder(logRotator(numToKeepStr: '10'))
@@ -10,7 +26,18 @@ pipeline {
   stages {
     stage('Dummy') {
       steps {
-        sh 'echo "Do Nothing..."'
+        container('terraform') {
+          sh 'terraform init'
+          sh 'terraform validate'
+          script {
+            plan = sh(returnStdout: true, script: 'terraform plan -no-color')
+            pullRequest.comment('```\n' + plan)
+          }
+        }
+        // jnlp has a shell available
+        sh 'curl --silent --location --show-error --output tfsec https://github.com/tfsec/tfsec/releases/download/v0.36.9/tfsec-linux-amd64'
+        sh 'chmod a+x tfsec'
+        sh './tfsec'
       }
     }
   }
