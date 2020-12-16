@@ -8,11 +8,6 @@ spec:
     command:
     - cat
     tty: true
-  - name: tfsec
-    image: liamg/tfsec:v0.36.9
-    command:
-    - cat
-    tty: true
 """
 
 pipeline {
@@ -34,6 +29,9 @@ pipeline {
         container('terraform') {
           sh 'terraform init'
           sh 'terraform validate'
+          sh 'curl --silent --location --show-error --output tfsec https://github.com/tfsec/tfsec/releases/download/v0.36.9/tfsec-linux-amd64'
+          sh 'chmod a+x tfsec'
+          sh './tfsec'
           script {
             plan = sh(returnStdout: true, script: 'terraform plan -no-color')
             pullRequest.comment('```\n' + plan)
