@@ -11,6 +11,7 @@ pipeline {
     stage('Dummy') {
       steps {
         sh 'echo "Do Nothing..."'
+        pullRequest.comment('This PR is highly illogical..')  
       }
     }
   }
