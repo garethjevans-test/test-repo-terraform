@@ -35,7 +35,7 @@ pipeline {
           sh 'terraform init'
           sh 'terraform validate'
           script {
-            plan = sh(returnStdout: true, script: 'terraform plan')
+            plan = sh(returnStdout: true, script: 'terraform plan -no-color')
             pullRequest.comment('```\n' + plan)
           }
         }
