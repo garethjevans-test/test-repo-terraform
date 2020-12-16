@@ -34,6 +34,10 @@ pipeline {
         sh 'echo "Do Nothing..."'
         pullRequest.comment('This PR is highly illogical..')  
       }
+      container('terraform') {
+        sh 'terraform init'
+        sh 'terraform validate'
+      }
     }
   }
 }
