@@ -1,5 +1,26 @@
+def terraformTemplate = """
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: terraform
+    image: hashicorp/terraform:0.13.5
+    command:
+    - cat
+    tty: true
+  - name: tfsec
+    image: liamg/tfsec:v0.36.9
+    command:
+    - cat
+    tty: true
+"""
+
 pipeline {
-  agent any
+  agent {
+    kubernetes {
+      yaml terraformTemplate
+    }
+  }
 
   options {
     buildDiscarder(logRotator(numToKeepStr: '10'))
